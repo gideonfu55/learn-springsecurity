@@ -6,6 +6,8 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -27,15 +29,48 @@ public class ProjectSecurityConfig {
   @Bean
   public InMemoryUserDetailsManager userDetailsService() {
 
-    // Approach to use DefaultPasswordEncoder() method
+    // Approach 1 to use DefaultPasswordEncoder() method when creating the user details:
 
-    UserDetails admin = User.withDefaultPasswordEncoder()
-      .username("admin")
+    // UserDetails admin = User.withDefaultPasswordEncoder()
+    //   .username("admin")
+    //   .password("12345")
+    //   .authorities("ADMIN")
+    //   .build();
+
+    // UserDetails user = User.withDefaultPasswordEncoder()
+    //   .username("user")
+    //   .password("12345")
+    //   .authorities("USER")
+    //   .build();
+
+    // return new InMemoryUserDetailsManager(admin, user);
+
+    // Approach 2 where we use NoOpPasswordEncoder Bean when creating the user details:
+    UserDetails admin = User.withUsername("admin")
       .password("12345")
-      .roles("ADMIN")
+      .authorities("ADMIN")
       .build();
 
-    return new InMemoryUserDetailsManager(admin);
+    UserDetails user = User.withUsername("user")
+      .password("12345")
+      .authorities("USER")
+      .build();
+
+    return new InMemoryUserDetailsManager(admin, user);
+
+  }
+
+  /**
+   * NoOpPasswordEncoder is not recommended for production use.
+   * Use only for non-prod environments.
+   * 
+   * Instead use an adaptive one way function like BCryptPasswordEncoder, Pbkdf2PasswordEncoder, or SCryptPasswordEncoder.
+   * 
+   * @return PasswordEncoder
+   */
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return NoOpPasswordEncoder.getInstance();
   }
 
 }
