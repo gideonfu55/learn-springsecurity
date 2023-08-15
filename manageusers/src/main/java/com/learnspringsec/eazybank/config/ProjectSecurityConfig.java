@@ -70,10 +70,10 @@ public class ProjectSecurityConfig {
    * @param dataSource
    * @return
    */
-  @Bean
-  public UserDetailsService userDetailsService(DataSource dataSource) {
-    return new JdbcUserDetailsManager(dataSource);
-  }
+  // @Bean
+  // public UserDetailsService userDetailsService(DataSource dataSource) {
+  //   return new JdbcUserDetailsManager(dataSource);
+  // }
 
   /**
    * NoOpPasswordEncoder is not recommended for production use.
