@@ -5,7 +5,7 @@ use eazybank;
 CREATE TABLE `users` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `username` VARCHAR(45) NOT NULL,
-  `password` VARCHAR(45) NOT NULL,
+  `password` VARCHAR(100) NOT NULL,
   `enabled` INT NOT NULL,
 
   PRIMARY KEY (`id`)
@@ -25,7 +25,7 @@ INSERT IGNORE INTO `authorities` VALUES (NULL, 'happy', 'write')
 CREATE TABLE `customer` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `email` VARCHAR(45) NOT NULL,
-  `password` VARCHAR(45) NOT NULL,
+  `password` VARCHAR(100) NOT NULL,
   `role` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id`)
 );

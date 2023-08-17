@@ -28,8 +28,7 @@ public class ProjectSecurityConfig {
   }
 
   /**
-   * This is the recommended way (encoder) to encode passwords in Spring Security 5 and above.
-   * 
+   * This is the recommended way (encoder) to encode passwords in Spring Security 5 and above - using BCryptPasswordEncoder.
    */
   @Bean
   public PasswordEncoder passwordEncoder() {
