@@ -18,7 +18,7 @@ export class AccountComponent implements OnInit {
     if (this.user) {
       this.dashboardService.getAccountDetails(this.user.id).subscribe(
         responseData => {
-          this.account = <any>responseData.body;
+          this.account = <never>responseData.body;
         });
     }
 
