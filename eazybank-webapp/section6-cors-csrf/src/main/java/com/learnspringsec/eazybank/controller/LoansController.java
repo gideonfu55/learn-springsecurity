@@ -1,14 +1,29 @@
 package com.learnspringsec.eazybank.controller;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.learnspringsec.eazybank.model.Loans;
+import com.learnspringsec.eazybank.repository.LoanRepository;
 
 @RestController
 public class LoansController {
+
+  @Autowired
+  private LoanRepository loanRepository;
   
   @GetMapping("/myLoans")
-  public String getAccountDetails() {
-    return "Here are the loans details from the DB";
+  public List<Loans> getLoanDetails(@RequestParam int id) {
+    List<Loans> loans = loanRepository.findByCustomerIdOrderByStartDtDesc(id);
+    if (loans != null) {
+      return loans;
+    } else {
+      return null;
+    }
   }
 
 }
