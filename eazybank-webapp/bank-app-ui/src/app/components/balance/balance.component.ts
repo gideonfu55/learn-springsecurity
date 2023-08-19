@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Component, OnInit } from '@angular/core';
 import { User } from 'src/app/model/user.model';
 import { DashboardService } from '../../services/dashboard/dashboard.service';
@@ -11,7 +12,7 @@ import { DashboardService } from '../../services/dashboard/dashboard.service';
 export class BalanceComponent implements OnInit {
 
   user = new User();
-  transactions = new Array();
+  transactions = <any>[];
 
   constructor(private dashboardService: DashboardService) { }
 

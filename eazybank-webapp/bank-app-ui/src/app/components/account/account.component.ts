@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Component, OnInit } from '@angular/core';
 import { DashboardService } from '../../services/dashboard/dashboard.service';
 import { User } from 'src/app/model/user.model';
@@ -18,7 +19,7 @@ export class AccountComponent implements OnInit {
     if (this.user) {
       this.dashboardService.getAccountDetails(this.user.id).subscribe(
         responseData => {
-          this.account = <never>responseData.body;
+          this.account = <any>responseData.body;
         });
     }
 
