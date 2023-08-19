@@ -28,10 +28,10 @@ public class LoginController {
     
     try {
       // This is to encode the password before setting the password for customer:
-      String hashPwd = passwordEncoder.encode(customer.getPassword());
+      String hashPwd = passwordEncoder.encode(customer.getPwd());
 
       // Set password to the encoded password before saving it to the database:
-      customer.setPassword(hashPwd);
+      customer.setPwd(hashPwd);
 
       savedCustomer = customerRepository.save(customer);
       
