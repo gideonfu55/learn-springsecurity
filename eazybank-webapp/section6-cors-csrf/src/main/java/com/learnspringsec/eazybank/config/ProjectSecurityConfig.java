@@ -6,13 +6,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+
+import com.learnspringsec.eazybank.filter.CsrfCookieFilter;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -23,10 +27,13 @@ public class ProjectSecurityConfig {
   @Bean
   SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 
+    // Need to create the CsrfTokenRequestAttributeHandler object to customize the CSRF protection:
     CsrfTokenRequestAttributeHandler csrfTokenHandler = new CsrfTokenRequestAttributeHandler();
     csrfTokenHandler.setCsrfRequestAttributeName("_csrf");
 
     http
+      .securityContext(context -> context.requireExplicitSave(false))
+      .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
       // Addition of CORs configuration:
       .cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
         @Override
@@ -43,10 +50,17 @@ public class ProjectSecurityConfig {
       // Rather than simply disabling the CSRF protection, you can customize it to your needs:
       // .csrf(csrf -> csrf.disable())
       // .csrf(csrf -> csrf.ignoringRequestMatchers("/contact", "/register"))
+
+      /**
+       * The CookieCsrfTokenRepository class is necessary to persist the CSRF token in a cookie names "XSRF-TOKEN" and reads 
+       * from a header named "X-XSRF-TOKEN" following the conventions of Angular JS. When using Angular JS, you need to have the 
+       * withHttpOnlyFalse() so that it can be read by the Angular FE.
+      */
       .csrf(csrf -> csrf.csrfTokenRequestHandler(csrfTokenHandler).ignoringRequestMatchers("/contact", "/register")
         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
       )
-      .authorizeHttpRequests((requests) -> requests
+      .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
+      .authorizeHttpRequests(requests -> requests
         .requestMatchers("/myAccount", "myBalance", "/myLoans", "/myCards", "/user").authenticated()
         .requestMatchers("notices", "/contact", "/register").permitAll()
       )
