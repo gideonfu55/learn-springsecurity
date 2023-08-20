@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-array-constructor */
 import { Component, OnInit } from '@angular/core';
 import { Loans } from 'src/app/model/loans.model';
 import { User } from 'src/app/model/user.model';
