@@ -27,12 +27,20 @@ public class ProjectSecurityConfig {
   @Bean
   SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 
-    // Need to create the CsrfTokenRequestAttributeHandler object to customize the CSRF protection:
+    /**
+     * An implementation of the {@link CsrfTokenRequestHandler} interface that is capable of making the {@link CsrfToken} 
+     * available as a request attribute and resolving the token value as either a header or parameter value of the request.
+     *
+     * @author Steve Riesenberg
+     * @since 5.8
+     */
     CsrfTokenRequestAttributeHandler csrfTokenHandler = new CsrfTokenRequestAttributeHandler();
     csrfTokenHandler.setCsrfRequestAttributeName("_csrf");
 
     http
+      // By default the security context is saved automatically. This can reduce unnecessary database writes caused by frequent updates to the security context:
       .securityContext(context -> context.requireExplicitSave(false))
+      // This will mean a session will be created for every request. This is not recommended for production applications:
       .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
       // Addition of CORs configuration:
       .cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
@@ -56,13 +64,13 @@ public class ProjectSecurityConfig {
        * from a header named "X-XSRF-TOKEN" following the conventions of Angular JS. When using Angular JS, you need to have the 
        * withHttpOnlyFalse() so that it can be read by the Angular FE.
       */
-      .csrf(csrf -> csrf.csrfTokenRequestHandler(csrfTokenHandler).ignoringRequestMatchers("/contact", "/register")
+      .csrf(csrf -> csrf.csrfTokenRequestHandler(csrfTokenHandler).ignoringRequestMatchers("/register")
         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
       )
       .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
       .authorizeHttpRequests(requests -> requests
-        .requestMatchers("/myAccount", "myBalance", "/myLoans", "/myCards", "/user").authenticated()
-        .requestMatchers("notices", "/contact", "/register").permitAll()
+        .requestMatchers("/myAccount", "myBalance", "/myLoans", "/myCards", "/contact", "/user").authenticated()
+        .requestMatchers("notices", "/register").permitAll()
       )
       .formLogin(Customizer.withDefaults())
       .httpBasic(Customizer.withDefaults());
