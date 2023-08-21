@@ -64,13 +64,13 @@ public class ProjectSecurityConfig {
        * from a header named "X-XSRF-TOKEN" following the conventions of Angular JS. When using Angular JS, you need to have the 
        * withHttpOnlyFalse() so that it can be read by the Angular FE.
       */
-      .csrf(csrf -> csrf.csrfTokenRequestHandler(csrfTokenHandler).ignoringRequestMatchers("/register")
+      .csrf(csrf -> csrf.csrfTokenRequestHandler(csrfTokenHandler).ignoringRequestMatchers("/contact", "/register")
         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
       )
       .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
       .authorizeHttpRequests(requests -> requests
-        .requestMatchers("/myAccount", "myBalance", "/myLoans", "/myCards", "/contact", "/user").authenticated()
-        .requestMatchers("notices", "/register").permitAll()
+        .requestMatchers("/myAccount", "myBalance", "/myLoans", "/myCards", "/user").authenticated()
+        .requestMatchers("notices", "/contact", "/register").permitAll()
       )
       .formLogin(Customizer.withDefaults())
       .httpBasic(Customizer.withDefaults());
