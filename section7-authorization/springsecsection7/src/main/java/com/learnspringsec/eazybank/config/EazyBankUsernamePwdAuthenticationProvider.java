@@ -2,6 +2,7 @@ package com.learnspringsec.eazybank.config;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -14,6 +15,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import com.learnspringsec.eazybank.model.Authority;
 import com.learnspringsec.eazybank.model.Customer;
 import com.learnspringsec.eazybank.repository.CustomerRepository;
 
@@ -35,15 +37,22 @@ public class EazyBankUsernamePwdAuthenticationProvider implements Authentication
 
     if (!customer.isEmpty()) {
       if (passwordEncoder.matches(password, customer.get(0).getPwd())) {
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(customer.get(0).getRole()));
-        return new UsernamePasswordAuthenticationToken(username, password, authorities);
+        return new UsernamePasswordAuthenticationToken(username, password, getGrantedAuthorities(customer.get(0).getAuthorities()));
       } else {
         throw new BadCredentialsException("Invalid password");
       }
     } else {
       throw new BadCredentialsException("No user registered with this details!");
     }
+  }
+
+  private List<GrantedAuthority> getGrantedAuthorities(Set<Authority> authorities) {
+    List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
+    for (Authority authority : authorities) {
+      grantedAuthorities.add(new SimpleGrantedAuthority(authority.getName()));
+    }
+
+    return grantedAuthorities;
   }
 
   @Override

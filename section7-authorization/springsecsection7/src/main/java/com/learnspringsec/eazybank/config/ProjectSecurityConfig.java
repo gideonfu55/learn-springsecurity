@@ -69,7 +69,14 @@ public class ProjectSecurityConfig {
       )
       .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
       .authorizeHttpRequests(requests -> requests
-        .requestMatchers("/myAccount", "myBalance", "/myLoans", "/myCards", "/user").authenticated()
+        // Configuration for authorizations/access based on the request path:
+        .requestMatchers("/myAccount").hasAuthority("VIEWACCOUNT")
+        .requestMatchers("/myBalance").hasAnyAuthority("VIEWACCOUNT", "VIEWBALANCE")
+        .requestMatchers("/myLoans").hasAuthority("VIEWLOANS")
+        .requestMatchers("/myCards").hasAuthority("VIEWCARDS")
+        // Configuration of authentication for all users:
+        .requestMatchers("/user").authenticated()
+        // Configuration of paths (public) for which no authentication is required:
         .requestMatchers("notices", "/contact", "/register").permitAll()
       )
       .formLogin(Customizer.withDefaults())
