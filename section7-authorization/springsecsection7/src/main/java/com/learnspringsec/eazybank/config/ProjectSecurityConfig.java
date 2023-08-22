@@ -70,12 +70,20 @@ public class ProjectSecurityConfig {
       .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
       .authorizeHttpRequests(requests -> requests
         // Configuration for authorizations/access based on the request path:
-        .requestMatchers("/myAccount").hasAuthority("VIEWACCOUNT")
-        .requestMatchers("/myBalance").hasAnyAuthority("VIEWACCOUNT", "VIEWBALANCE")
-        .requestMatchers("/myLoans").hasAuthority("VIEWLOANS")
-        .requestMatchers("/myCards").hasAuthority("VIEWCARDS")
+        // .requestMatchers("/myAccount").hasAuthority("VIEWACCOUNT")
+        // .requestMatchers("/myBalance").hasAnyAuthority("VIEWACCOUNT", "VIEWBALANCE")
+        // .requestMatchers("/myLoans").hasAuthority("VIEWLOANS")
+        // .requestMatchers("/myCards").hasAuthority("VIEWCARDS")
+
+        // Configuration for roles based on the request path (note that these are just examples - the user and admin should both be able to access all bank details in an actual banking application):
+        .requestMatchers("/myAccount").hasRole("USER")
+        .requestMatchers("/myBalance").hasAnyRole("USER", "ADMIN")
+        .requestMatchers("/myLoans").hasRole("USER")
+        .requestMatchers("/myCards").hasRole("MANAGER")
+
         // Configuration of authentication for all users:
         .requestMatchers("/user").authenticated()
+        
         // Configuration of paths (public) for which no authentication is required:
         .requestMatchers("notices", "/contact", "/register").permitAll()
       )
