@@ -33,7 +33,7 @@ public class EazyBankUsernamePwdAuthenticationProvider implements Authentication
 
     List<Customer> customer = customerRepository.findByEmail(username);
 
-    if (customer.size() > 0) {
+    if (!customer.isEmpty()) {
       if (passwordEncoder.matches(password, customer.get(0).getPwd())) {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(customer.get(0).getRole()));
