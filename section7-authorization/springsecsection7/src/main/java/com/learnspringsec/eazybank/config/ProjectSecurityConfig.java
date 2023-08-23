@@ -79,7 +79,8 @@ public class ProjectSecurityConfig {
         .requestMatchers("/myAccount").hasRole("USER")
         .requestMatchers("/myBalance").hasAnyRole("USER", "ADMIN")
         .requestMatchers("/myLoans").hasRole("USER")
-        .requestMatchers("/myCards").hasRole("MANAGER")
+        .requestMatchers("/myCards").hasRole("USER")
+        // .requestMatchers("/myCards").hasRole("MANAGER") // this won't be retrieved as there are no users with 'MANAGER' role currently
 
         // Configuration of authentication for all users:
         .requestMatchers("/user").authenticated()
