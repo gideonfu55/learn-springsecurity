@@ -37,6 +37,7 @@ public class RequestValidationBeforeFilter implements Filter {
                     if (delim == -1) {
                         throw new BadCredentialsException("Invalid basic authentication token");
                     }
+                    // This is just part of the custom validation to filter out any email addresses that contain the word "test" (e.g. if hackers use fake emails to test the system):
                     String email = token.substring(0, delim);
                     if (email.toLowerCase().contains("test")) {
                         res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
