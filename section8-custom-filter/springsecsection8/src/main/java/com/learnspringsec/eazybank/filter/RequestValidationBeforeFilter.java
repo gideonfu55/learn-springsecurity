@@ -13,6 +13,7 @@ import java.util.Base64;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
+// RequestValidationBeforeFilter is a custom filter that will be executed before the BasicAuthenticationFilter.
 public class RequestValidationBeforeFilter implements Filter {
 
     public static final String AUTHENTICATION_SCHEME_BASIC = "Basic";
