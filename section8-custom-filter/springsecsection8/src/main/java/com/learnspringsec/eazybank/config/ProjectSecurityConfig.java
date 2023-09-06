@@ -2,6 +2,8 @@ package com.learnspringsec.eazybank.config;
 
 import java.util.Collections;
 
+import com.learnspringsec.eazybank.filter.CsrfCookieFilter;
+import com.learnspringsec.eazybank.filter.RequestValidationBeforeFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -15,8 +17,6 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
-
-import com.learnspringsec.eazybank.filter.CsrfCookieFilter;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -38,7 +38,7 @@ public class ProjectSecurityConfig {
     csrfTokenHandler.setCsrfRequestAttributeName("_csrf");
 
     http
-      // By default the security context is saved automatically. This can reduce unnecessary database writes caused by frequent updates to the security context:
+      // By default, the security context is saved automatically. This can reduce unnecessary database writes caused by frequent updates to the security context:
       .securityContext(context -> context.requireExplicitSave(false))
       // This will mean a session will be created for every request. This is not recommended for production applications:
       .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
@@ -68,13 +68,8 @@ public class ProjectSecurityConfig {
         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
       )
       .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
+      .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
       .authorizeHttpRequests(requests -> requests
-        // Configuration for authorizations/access based on the request path:
-        // .requestMatchers("/myAccount").hasAuthority("VIEWACCOUNT")
-        // .requestMatchers("/myBalance").hasAnyAuthority("VIEWACCOUNT", "VIEWBALANCE")
-        // .requestMatchers("/myLoans").hasAuthority("VIEWLOANS")
-        // .requestMatchers("/myCards").hasAuthority("VIEWCARDS")
-
         // Configuration for roles based on the request path (note that these are just examples - the user and admin should both be able to access all bank details in an actual banking application):
         .requestMatchers("/myAccount").hasRole("USER")
         .requestMatchers("/myBalance").hasAnyRole("USER", "ADMIN")
