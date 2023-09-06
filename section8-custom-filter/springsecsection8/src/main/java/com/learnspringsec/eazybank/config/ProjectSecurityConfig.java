@@ -2,6 +2,7 @@ package com.learnspringsec.eazybank.config;
 
 import java.util.Collections;
 
+import com.learnspringsec.eazybank.filter.AuthoritiesLoggingAfterFilter;
 import com.learnspringsec.eazybank.filter.CsrfCookieFilter;
 import com.learnspringsec.eazybank.filter.RequestValidationBeforeFilter;
 import org.springframework.context.annotation.Bean;
@@ -69,6 +70,7 @@ public class ProjectSecurityConfig {
       )
       .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
       .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
+      .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
       .authorizeHttpRequests(requests -> requests
         // Configuration for roles based on the request path (note that these are just examples - the user and admin should both be able to access all bank details in an actual banking application):
         .requestMatchers("/myAccount").hasRole("USER")
