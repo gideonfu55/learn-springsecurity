@@ -1,11 +1,9 @@
 package com.learnspringsec.eazybank.config;
 
+import java.util.Arrays;
 import java.util.Collections;
 
-import com.learnspringsec.eazybank.filter.AuthoritiesLoggingAfterFilter;
-import com.learnspringsec.eazybank.filter.AuthoritiesLoggingAtFilter;
-import com.learnspringsec.eazybank.filter.CsrfCookieFilter;
-import com.learnspringsec.eazybank.filter.RequestValidationBeforeFilter;
+import com.learnspringsec.eazybank.filter.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -28,22 +26,17 @@ public class ProjectSecurityConfig {
   // Basic structure for customizing your Security Configuration:
   @Bean
   SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-
     /**
      * An implementation of the {@link CsrfTokenRequestHandler} interface that is capable of making the {@link CsrfToken} 
      * available as a request attribute and resolving the token value as either a header or parameter value of the request.
-     *
-     * @author Steve Riesenberg
-     * @since 5.8
      */
     CsrfTokenRequestAttributeHandler csrfTokenHandler = new CsrfTokenRequestAttributeHandler();
     csrfTokenHandler.setCsrfRequestAttributeName("_csrf");
 
     http
-      // By default, the security context is saved automatically. This can reduce unnecessary database writes caused by frequent updates to the security context:
-      .securityContext(context -> context.requireExplicitSave(false))
-      // This will mean a session will be created for every request. This is not recommended for production applications:
-      .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
+      .sessionManagement(sessionManagement -> sessionManagement
+        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+      )
       // Addition of CORs configuration:
       .cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
         @Override
@@ -53,13 +46,11 @@ public class ProjectSecurityConfig {
           config.setAllowedMethods(Collections.singletonList("*"));
           config.setAllowCredentials(true);
           config.setAllowedHeaders(Collections.singletonList("*"));
+          config.setExposedHeaders(Arrays.asList("Authorization"));
           config.setMaxAge(3600L);
           return config;
         }
       }))
-      // Rather than simply disabling the CSRF protection, you can customize it to your needs:
-      // .csrf(csrf -> csrf.disable())
-      // .csrf(csrf -> csrf.ignoringRequestMatchers("/contact", "/register"))
 
       /**
        * The CookieCsrfTokenRepository class is necessary to persist the CSRF token in a cookie names "XSRF-TOKEN" and reads 
@@ -69,10 +60,11 @@ public class ProjectSecurityConfig {
       .csrf(csrf -> csrf.csrfTokenRequestHandler(csrfTokenHandler).ignoringRequestMatchers("/contact", "/register")
         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
       )
-      .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
-      .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
-      .addFilterAt(new AuthoritiesLoggingAtFilter(), BasicAuthenticationFilter.class)
-      .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
+        .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
+        .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
+        .addFilterAt(new AuthoritiesLoggingAtFilter(), BasicAuthenticationFilter.class)
+        .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
+        .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
       .authorizeHttpRequests(requests -> requests
         // Configuration for roles based on the request path (note that these are just examples - the user and admin should both be able to access all bank details in an actual banking application):
         .requestMatchers("/myAccount").hasRole("USER")
