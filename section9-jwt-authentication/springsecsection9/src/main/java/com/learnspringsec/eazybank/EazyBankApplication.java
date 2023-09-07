@@ -6,7 +6,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 
 // Add EnableWebSecurity annotation for debugging
 @SpringBootApplication
-@EnableWebSecurity(debug = true)
+//@EnableWebSecurity(debug = true)
 public class EazyBankApplication {
 
 	public static void main(String[] args) {
